@@ -2,8 +2,6 @@
 
 namespace app\merchant\controller;
 
-
-
 use app\common\controller\MerchantController;
 use think\App;
 use think\facade\Env;
@@ -66,9 +64,12 @@ class Index extends MerchantController
             $map[] = ['pay_time', 'between', [$start_time,$end_time]];
             $chart_order[] = Order::where($map)->sum("actual_usdt");
         }
-        $this->assign('chart_time', json_encode($chart_time) );
-        $this->assign('chart_order', json_encode($chart_order) );
-        $this->assign('url', $_SERVER['REQUEST_SCHEME']."://".$_SERVER['HTTP_HOST']."/payment?id=".$row['appid'] );
+        $this->assign('chart_time', json_encode($chart_time));
+        $this->assign('chart_order', json_encode($chart_order));
+        
+        // 修改这里:使用更安全的方式获取scheme
+        $scheme = isset($_SERVER['REQUEST_SCHEME']) ? $_SERVER['REQUEST_SCHEME'] : ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http');
+        $this->assign('url', $scheme."://".$_SERVER['HTTP_HOST']."/payment?id=".$row['appid']);
 
         $merchantmodel = new \app\common\model\MerchantMerchant();
         $merchantmap[]=['id','=',session('merchant.id')];
@@ -215,5 +216,4 @@ class Index extends MerchantController
         $this->assign('row', $row);
         return $this->fetch();
     }
-
 }
